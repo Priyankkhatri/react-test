@@ -4,7 +4,7 @@ import { useFavorites } from '../context/FavoritesContext';
 import Loader from '../components/Loader';
 import ErrorCard from '../components/ErrorCard';
 import { BiArrowBack, BiHeart, BiSolidHeart } from 'react-icons/bi';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import './MovieDetails.css';
 
 const API_KEY = import.meta.env.VITE_OMDB_API_KEY;
@@ -62,68 +62,106 @@ const MovieDetails = () => {
 
     return (
         <motion.div
-            className="movie-details-container container glass"
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4 }}
+            className="movie-details-container glass"
+            initial={{ opacity: 0, scale: 0.98, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.98, y: 20 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
         >
-            <button className="btn btn-outline back-btn" onClick={() => navigate(-1)}>
-                <BiArrowBack /> Back
-            </button>
+            <div
+                className="hero-backdrop"
+                style={{ backgroundImage: `url(${posterUrl})` }}
+            ></div>
+            <div className="hero-overlay"></div>
 
-            <div className="details-grid">
-                <div className="details-poster-wrapper">
-                    <img src={posterUrl} alt={`${movie.Title} poster`} className="details-poster" />
+            <div className="details-content-wrapper">
+                <div className="top-bar">
+                    <button className="btn btn-outline back-btn" onClick={() => navigate(-1)}>
+                        <BiArrowBack /> Back
+                    </button>
                 </div>
 
-                <div className="details-content">
-                    <h1 className="details-title">{movie.Title} <span className="text-secondary">({movie.Year})</span></h1>
-
-                    <div className="details-meta">
-                        <span className="badge">{movie.Rated}</span>
-                        <span>{movie.Runtime}</span>
-                        <span>{movie.Genre}</span>
+                <div className="details-grid">
+                    <div className="details-poster-wrapper">
+                        <motion.img
+                            src={posterUrl}
+                            alt={`${movie.Title} poster`}
+                            className="details-poster"
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.6, delay: 0.2 }}
+                        />
                     </div>
 
-                    <button
-                        className={`btn ${isFav ? 'btn-outline' : 'btn-primary'} fav-btn`}
-                        onClick={handleFavoriteClick}
+                    <motion.div
+                        className="details-content"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.6, delay: 0.3 }}
                     >
-                        {isFav ? (
-                            <><BiSolidHeart size={20} /> Remove from Favorites</>
-                        ) : (
-                            <><BiHeart size={20} /> Add to Favorites</>
-                        )}
-                    </button>
+                        <h1 className="details-title">
+                            {movie.Title} <span className="title-year">({movie.Year})</span>
+                        </h1>
 
-                    <div className="details-section">
-                        <h3>Plot</h3>
-                        <p>{movie.Plot}</p>
-                    </div>
-
-                    <div className="details-stats">
-                        <p><strong>Director:</strong> {movie.Director}</p>
-                        <p><strong>Actors:</strong> {movie.Actors}</p>
-                        <p><strong>Language:</strong> {movie.Language}</p>
-                        <p><strong>Country:</strong> {movie.Country}</p>
-                        {movie.BoxOffice && movie.BoxOffice !== 'N/A' && (
-                            <p><strong>Box Office:</strong> {movie.BoxOffice}</p>
-                        )}
-                    </div>
-
-                    {movie.Ratings && movie.Ratings.length > 0 && (
-                        <div className="details-section">
-                            <h3>Ratings</h3>
-                            <ul className="ratings-list">
-                                {movie.Ratings.map((rating, index) => (
-                                    <li key={index} className="rating-item">
-                                        <span className="rating-source">{rating.Source}</span>
-                                        <span className="rating-value">{rating.Value}</span>
-                                    </li>
-                                ))}
-                            </ul>
+                        <div className="details-meta">
+                            <span className="meta-badge">{movie.Rated}</span>
+                            <span>{movie.Runtime}</span>
+                            <span>{movie.Genre}</span>
                         </div>
-                    )}
+
+                        <motion.button
+                            className={`btn ${isFav ? 'btn-outline' : 'btn-primary'} fav-btn`}
+                            onClick={handleFavoriteClick}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                        >
+                            <AnimatePresence mode="wait">
+                                <motion.div
+                                    key={isFav ? 'remove' : 'add'}
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 10 }}
+                                    transition={{ duration: 0.2 }}
+                                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                                >
+                                    {isFav ? (
+                                        <><BiSolidHeart size={22} color="#ff007f" /> Exclude from Favorites</>
+                                    ) : (
+                                        <><BiHeart size={22} /> Add to Favorites</>
+                                    )}
+                                </motion.div>
+                            </AnimatePresence>
+                        </motion.button>
+
+                        <div className="details-section">
+                            <h3>Plot</h3>
+                            <p>{movie.Plot}</p>
+                        </div>
+
+                        <div className="details-section details-stats">
+                            <p><strong>Director</strong> {movie.Director}</p>
+                            <p><strong>Actors</strong> {movie.Actors}</p>
+                            <p><strong>Language</strong> {movie.Language}</p>
+                            <p><strong>Country</strong> {movie.Country}</p>
+                            {movie.BoxOffice && movie.BoxOffice !== 'N/A' && (
+                                <p><strong>Box Office</strong> {movie.BoxOffice}</p>
+                            )}
+                        </div>
+
+                        {movie.Ratings && movie.Ratings.length > 0 && (
+                            <div className="details-section">
+                                <h3>Ratings</h3>
+                                <div className="ratings-grid">
+                                    {movie.Ratings.map((rating, index) => (
+                                        <div key={index} className="rating-item">
+                                            <span className="rating-value">{rating.Value}</span>
+                                            <span className="rating-source">{rating.Source}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </motion.div>
                 </div>
             </div>
         </motion.div>

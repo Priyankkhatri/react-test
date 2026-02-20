@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import { BiSearch } from 'react-icons/bi';
+import { motion } from 'framer-motion';
 import './SearchBar.css';
 
 const SearchBar = ({ onSearch }) => {
     const [query, setQuery] = useState('batman');
     const [type, setType] = useState('');
     const [year, setYear] = useState('');
+
+    // Floating label states
+    const [isQueryFocused, setIsQueryFocused] = useState(false);
+    const [isYearFocused, setIsYearFocused] = useState(false);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -15,48 +20,87 @@ const SearchBar = ({ onSearch }) => {
     };
 
     return (
-        <div className="search-bar-container glass">
+        <motion.div
+            className="search-bar-container glass"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1, ease: 'easeOut' }}
+        >
             <form onSubmit={handleSubmit} className="search-form">
-                <div className="input-group search-input-group">
+
+                <div className={`input-group search-input-group ${isQueryFocused || query ? 'focused' : ''}`}>
                     <BiSearch className="search-icon" />
+                    <motion.label
+                        className="floating-label"
+                        animate={{
+                            y: isQueryFocused || query ? -28 : 0,
+                            scale: isQueryFocused || query ? 0.85 : 1,
+                            opacity: isQueryFocused || query ? 1 : 0.6
+                        }}
+                        transition={{ duration: 0.2 }}
+                    >
+                        Search movies, series...
+                    </motion.label>
                     <input
                         type="text"
-                        placeholder="Search movies, series..."
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
+                        onFocus={() => setIsQueryFocused(true)}
+                        onBlur={() => setIsQueryFocused(false)}
                         className="search-input"
                         aria-label="Search query"
                     />
                 </div>
 
                 <div className="filters-group">
-                    <select
-                        value={type}
-                        onChange={(e) => setType(e.target.value)}
-                        className="filter-select"
-                        aria-label="Filter by type"
+                    <div className="select-wrapper">
+                        <select
+                            value={type}
+                            onChange={(e) => setType(e.target.value)}
+                            className="filter-select"
+                            aria-label="Filter by type"
+                        >
+                            <option value="">All Types</option>
+                            <option value="movie">Movie</option>
+                            <option value="series">Series</option>
+                            <option value="episode">Episode</option>
+                        </select>
+                    </div>
+
+                    <div className={`input-group year-input-group ${isYearFocused || year ? 'focused' : ''}`}>
+                        <motion.label
+                            className="floating-label"
+                            animate={{
+                                y: isYearFocused || year ? -28 : 0,
+                                scale: isYearFocused || year ? 0.85 : 1,
+                                opacity: isYearFocused || year ? 1 : 0.6
+                            }}
+                            transition={{ duration: 0.2 }}
+                        >
+                            Year
+                        </motion.label>
+                        <input
+                            type="number"
+                            value={year}
+                            onChange={(e) => setYear(e.target.value)}
+                            onFocus={() => setIsYearFocused(true)}
+                            onBlur={() => setIsYearFocused(false)}
+                            className="filter-input year-input"
+                            aria-label="Filter by year"
+                        />
+                    </div>
+
+                    <motion.button
+                        type="submit"
+                        className="btn btn-primary search-btn"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.96 }}
                     >
-                        <option value="">All Types</option>
-                        <option value="movie">Movie</option>
-                        <option value="series">Series</option>
-                        <option value="episode">Episode</option>
-                    </select>
-
-                    <input
-                        type="number"
-                        placeholder="Year (e.g. 2023)"
-                        value={year}
-                        onChange={(e) => setYear(e.target.value)}
-                        className="filter-input year-input"
-                        aria-label="Filter by year"
-                    />
-
-                    <button type="submit" className="btn btn-primary search-btn">
                         Search
-                    </button>
+                    </motion.button>
                 </div>
             </form>
-        </div>
+        </motion.div>
     );
 };
 

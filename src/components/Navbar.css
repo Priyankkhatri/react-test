@@ -3,9 +3,10 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 60px;
+  height: var(--nav-height);
   z-index: 1000;
   border-bottom: 1px solid var(--glass-border);
+  background: rgba(11, 15, 20, 0.4);
 }
 
 .nav-content {
@@ -20,12 +21,19 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--accent-color);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-transform: uppercase;
 }
 
 .logo-icon {
-  font-size: 1.8rem;
+  font-size: 2rem;
+  color: var(--accent-2);
+  -webkit-text-fill-color: initial;
 }
 
 .nav-links {
@@ -35,29 +43,54 @@
 }
 
 .nav-link {
-  font-weight: 500;
-  color: var(--text-primary);
+  font-weight: 600;
+  color: var(--text-muted);
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.5rem;
-  border-radius: 4px;
-  transition: all 0.2s;
+  gap: 0.4rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 8px;
+  position: relative;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.nav-link::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: var(--accent-2);
+  transition: width 0.3s ease;
+  border-radius: 2px;
+  box-shadow: var(--shadow-glow);
 }
 
 .nav-link:hover, .nav-link.active {
-  color: var(--accent-color);
+  color: var(--text-primary);
+  text-shadow: 0 0 10px rgba(255,255,255,0.2);
+}
+
+.nav-link:hover::before, .nav-link.active::before {
+  width: 70%;
 }
 
 .badge {
-  background-color: var(--accent-color);
+  background: linear-gradient(135deg, var(--accent-1), #ff007f);
   color: white;
   font-size: 0.75rem;
-  font-weight: 700;
-  padding: 0.1rem 0.4rem;
+  font-weight: 800;
+  padding: 0.15rem 0.5rem;
   border-radius: 12px;
   min-width: 20px;
   text-align: center;
+  box-shadow: 0 0 10px rgba(255, 0, 127, 0.5);
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  line-height: 1;
 }
 
 @media (max-width: 600px) {
@@ -66,6 +99,9 @@
   }
   .nav-link {
     font-size: 0.9rem;
-    padding: 0.25rem;
+    padding: 0.25rem 0.5rem;
+  }
+  .nav-logo span {
+    display: none; /* Icon only on very small screens */
   }
 }

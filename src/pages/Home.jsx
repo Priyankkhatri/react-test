@@ -81,7 +81,7 @@ const Home = () => {
             {error && <ErrorCard message={error} />}
 
             {!loading && !error && movies.length === 0 && (
-                <div className="empty-state">
+                <div className="empty-state glass">
                     <h3>No results found</h3>
                     <p className="text-secondary">Try adjusting your search or filters.</p>
                 </div>

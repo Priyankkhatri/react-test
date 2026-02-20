@@ -3,6 +3,7 @@ import { useFavorites } from '../context/FavoritesContext';
 import MovieCard from '../components/MovieCard';
 import Loader from '../components/Loader';
 import ErrorCard from '../components/ErrorCard';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const API_KEY = import.meta.env.VITE_OMDB_API_KEY;
 
@@ -48,29 +49,65 @@ const Favorites = () => {
     if (error) return <ErrorCard message={error} />;
 
     return (
-        <div style={{ padding: '2rem 0' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1 style={{ color: 'var(--text-primary)' }}>Your Favorites</h1>
+        <motion.div
+            style={{ padding: '2rem 0' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+        >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3rem' }}>
+                <h1 style={{ color: 'var(--text-primary)', fontSize: '2.5rem', fontWeight: '900', letterSpacing: '-0.03em' }}>
+                    Your Favorites
+                </h1>
                 {favorites.length > 0 && (
-                    <button className="btn btn-outline" onClick={clearFavorites}>
+                    <motion.button
+                        className="btn btn-outline"
+                        onClick={clearFavorites}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
                         Clear All
-                    </button>
+                    </motion.button>
                 )}
             </div>
 
-            {favorites.length === 0 ? (
-                <div className="empty-state">
-                    <h3>No favorite movies added.</h3>
-                    <p className="text-secondary">Go to Home and click the heart icon to add some!</p>
-                </div>
-            ) : (
-                <div className="movie-grid">
-                    {favoriteMovies.map(movie => (
-                        <MovieCard key={movie.imdbID} movie={movie} />
-                    ))}
-                </div>
-            )}
-        </div>
+            <AnimatePresence mode="wait">
+                {favorites.length === 0 ? (
+                    <motion.div
+                        key="empty"
+                        className="empty-state glass"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                    >
+                        <h3>No favorite movies added.</h3>
+                        <p className="text-secondary" style={{ fontSize: '1.2rem' }}>Go to Home and click the heart icon to add some!</p>
+                    </motion.div>
+                ) : (
+                    <motion.div
+                        key="grid"
+                        className="movie-grid"
+                        initial="hidden"
+                        animate="visible"
+                        variants={{
+                            visible: { transition: { staggerChildren: 0.1 } }
+                        }}
+                    >
+                        {favoriteMovies.map(movie => (
+                            <motion.div
+                                key={movie.imdbID}
+                                variants={{
+                                    hidden: { opacity: 0, y: 20 },
+                                    visible: { opacity: 1, y: 0 }
+                                }}
+                            >
+                                <MovieCard movie={movie} />
+                            </motion.div>
+                        ))}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.div>
     );
 };
 
