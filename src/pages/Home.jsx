@@ -3,6 +3,8 @@ import SearchBar from '../components/SearchBar';
 import MovieCard from '../components/MovieCard';
 import Loader from '../components/Loader';
 import ErrorCard from '../components/ErrorCard';
+import { motion, AnimatePresence } from 'framer-motion';
+import './Home.css';
 
 const API_KEY = import.meta.env.VITE_OMDB_API_KEY;
 
@@ -10,10 +12,20 @@ const Home = () => {
     const [movies, setMovies] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [hasSearched, setHasSearched] = useState(false);
+    const [emptyQueryError, setEmptyQueryError] = useState(false);
 
     const abortControllerRef = useRef(null);
 
     const fetchMovies = async (searchQuery, typeFilter = '', yearFilter = '') => {
+        if (!searchQuery) {
+            setEmptyQueryError(true);
+            setTimeout(() => setEmptyQueryError(false), 800);
+            return;
+        }
+
+        setHasSearched(true);
+
         // Cancel previous request if any
         if (abortControllerRef.current) {
             abortControllerRef.current.abort();
@@ -57,10 +69,8 @@ const Home = () => {
         }
     };
 
-    // Default search on mount
+    // Cleanup abort controller on unmount
     useEffect(() => {
-        fetchMovies('batman');
-
         return () => {
             if (abortControllerRef.current) {
                 abortControllerRef.current.abort();
@@ -73,27 +83,103 @@ const Home = () => {
     };
 
     return (
-        <div>
-            <SearchBar onSearch={handleSearch} />
+        <div className={`home-page-container ${!hasSearched ? 'landing-mode' : 'results-mode'}`}>
+            <motion.div
+                className="home-search-section"
+                layout
+                transition={{ type: "spring", stiffness: 200, damping: 25 }}
+            >
+                <AnimatePresence>
+                    {!hasSearched && (
+                        <motion.div
+                            className="hero-text"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -20, height: 0, margin: 0 }}
+                            transition={{ duration: 0.6, ease: 'easeOut' }}
+                        >
+                            <h1 className="hero-heading">
+                                Discover Movies Like <span>Never Before</span>
+                            </h1>
+                            <p className="hero-subheading">
+                                Search millions of movies, series and episodes instantly in stunning detail.
+                            </p>
 
-            {loading && <Loader />}
+                            <div className="hero-bg-glows">
+                                <div className="glow glow-1"></div>
+                                <div className="glow glow-2"></div>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
-            {error && <ErrorCard message={error} />}
+                <motion.div
+                    className="search-bar-wrapper"
+                    animate={emptyQueryError ? { x: [-10, 10, -10, 10, -5, 5, 0] } : {}}
+                    transition={{ duration: 0.5 }}
+                >
+                    <SearchBar onSearch={handleSearch} emptyQueryError={emptyQueryError} />
 
-            {!loading && !error && movies.length === 0 && (
-                <div className="empty-state glass">
-                    <h3>No results found</h3>
-                    <p className="text-secondary">Try adjusting your search or filters.</p>
-                </div>
-            )}
+                    <AnimatePresence>
+                        {emptyQueryError && (
+                            <motion.p
+                                className="search-error-text"
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0 }}
+                            >
+                                Please enter a movie name to search.
+                            </motion.p>
+                        )}
+                    </AnimatePresence>
+                </motion.div>
+            </motion.div>
 
-            {movies.length > 0 && (
-                <div className="movie-grid">
-                    {movies.map((movie) => (
-                        <MovieCard key={movie.imdbID} movie={movie} />
-                    ))}
-                </div>
-            )}
+            <AnimatePresence>
+                {hasSearched && (
+                    <motion.div
+                        className="home-results-section"
+                        initial={{ opacity: 0, y: 40 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
+                    >
+                        {loading && <Loader />}
+
+                        {error && !loading && <ErrorCard message={error === "Movie not found!" ? "No movies found. Try another search." : error} />}
+
+                        {!loading && !error && movies.length === 0 && (
+                            <div className="empty-state glass">
+                                <h3>No results found</h3>
+                                <p className="text-secondary">Try adjusting your search or filters.</p>
+                            </div>
+                        )}
+
+                        {!loading && !error && movies.length > 0 && (
+                            <motion.div
+                                className="movie-grid"
+                                initial="hidden"
+                                animate="visible"
+                                variants={{
+                                    visible: { transition: { staggerChildren: 0.08 } }
+                                }}
+                            >
+                                {movies.map((movie) => (
+                                    <motion.div
+                                        key={movie.imdbID}
+                                        variants={{
+                                            hidden: { opacity: 0, y: 30 },
+                                            visible: { opacity: 1, y: 0 }
+                                        }}
+                                        transition={{ duration: 0.5, ease: 'easeOut' }}
+                                    >
+                                        <MovieCard movie={movie} />
+                                    </motion.div>
+                                ))}
+                            </motion.div>
+                        )}
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

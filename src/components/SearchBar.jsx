@@ -3,8 +3,8 @@ import { BiSearch } from 'react-icons/bi';
 import { motion } from 'framer-motion';
 import './SearchBar.css';
 
-const SearchBar = ({ onSearch }) => {
-    const [query, setQuery] = useState('batman');
+const SearchBar = ({ onSearch, emptyQueryError }) => {
+    const [query, setQuery] = useState('');
     const [type, setType] = useState('');
     const [year, setYear] = useState('');
 
@@ -47,7 +47,7 @@ const SearchBar = ({ onSearch }) => {
                         onChange={(e) => setQuery(e.target.value)}
                         onFocus={() => setIsQueryFocused(true)}
                         onBlur={() => setIsQueryFocused(false)}
-                        className="search-input"
+                        className={`search-input ${emptyQueryError ? 'input-error' : ''}`}
                         aria-label="Search query"
                     />
                 </div>

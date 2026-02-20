@@ -1,0 +1,147 @@
+/* Home.css */
+
+.home-page-container {
+    width: 100%;
+    min-height: calc(100vh - var(--nav-height) - 4rem);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.home-page-container.landing-mode {
+    justify-content: center;
+    align-items: center;
+}
+
+.home-page-container.results-mode {
+    justify-content: flex-start;
+    padding-top: 1rem;
+}
+
+.home-search-section {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 10;
+}
+
+.landing-mode .home-search-section {
+    transform: translateY(-5vh); /* Elevate slightly in hero mode */
+}
+
+/* =========================================
+   Hero Text Styling
+   ========================================= */
+.hero-text {
+    text-align: center;
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+.hero-heading {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+
+.hero-heading span {
+    background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+.hero-subheading {
+    font-size: clamp(1.1rem, 2vw, 1.4rem);
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+    font-weight: 400;
+}
+
+/* =========================================
+   Hero Background Glows (Centered Local)
+   ========================================= */
+.hero-bg-glows {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.glow {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.15;
+    animation: pulseGlow 8s infinite alternate ease-in-out;
+}
+
+.glow-1 {
+    width: 400px;
+    height: 400px;
+    background: var(--accent-1);
+    top: -50%;
+    left: 10%;
+}
+
+.glow-2 {
+    width: 300px;
+    height: 300px;
+    background: var(--accent-2);
+    bottom: -50%;
+    right: 10%;
+    animation-delay: -4s;
+}
+
+@keyframes pulseGlow {
+    0% { transform: scale(1) translate(0, 0); opacity: 0.1; }
+    50% { transform: scale(1.1) translate(5%, 5%); opacity: 0.2; }
+    100% { transform: scale(0.95) translate(-5%, -5%); opacity: 0.15; }
+}
+
+/* =========================================
+   Search Bar Wrapper
+   ========================================= */
+.search-bar-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.search-error-text {
+    position: absolute;
+    bottom: -2rem;
+    left: 2rem;
+    color: #ff3b30;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-shadow: 0 2px 8px rgba(255, 59, 48, 0.4);
+}
+
+/* =========================================
+   Results Section Transition
+   ========================================= */
+.home-results-section {
+    width: 100%;
+    position: relative;
+    z-index: 5;
+    padding-top: 1rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .glow {
+        animation: none;
+    }
+}
