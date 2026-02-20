@@ -19,6 +19,23 @@
     padding-top: 1rem;
 }
 
+/* =========================================
+   Dynamic Background System
+   ========================================= */
+.dynamic-background-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    pointer-events: none;
+    background: var(--dynamic-bg);
+    background-size: 150% 150%;
+    transition: background 1.2s ease-in-out;
+    animation: bgPulse 25s ease-in-out infinite alternate;
+}
+
 .home-search-section {
     width: 100%;
     max-width: 900px;

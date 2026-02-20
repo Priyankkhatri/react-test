@@ -62,7 +62,7 @@ const MovieDetails = () => {
 
     return (
         <motion.div
-            className="movie-details-container glass"
+            className="movie-details-container"
             initial={{ opacity: 0, scale: 0.98, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.98, y: 20 }}
@@ -74,7 +74,7 @@ const MovieDetails = () => {
             ></div>
             <div className="hero-overlay"></div>
 
-            <div className="details-content-wrapper">
+            <div className="details-content-wrapper glass">
                 <div className="top-bar">
                     <button className="btn btn-outline back-btn" onClick={() => navigate(-1)}>
                         <BiArrowBack /> Back

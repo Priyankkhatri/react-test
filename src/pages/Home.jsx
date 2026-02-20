@@ -4,6 +4,7 @@ import MovieCard from '../components/MovieCard';
 import Loader from '../components/Loader';
 import ErrorCard from '../components/ErrorCard';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Vibrant } from 'node-vibrant/browser';
 import './Home.css';
 
 const API_KEY = import.meta.env.VITE_OMDB_API_KEY;
@@ -14,6 +15,7 @@ const Home = () => {
     const [error, setError] = useState(null);
     const [hasSearched, setHasSearched] = useState(false);
     const [emptyQueryError, setEmptyQueryError] = useState(false);
+    const [dynamicTheme, setDynamicTheme] = useState(null); // Stores extracted gradient colors
 
     const abortControllerRef = useRef(null);
 
@@ -56,6 +58,22 @@ const Home = () => {
 
             if (data.Response === 'True') {
                 setMovies(data.Search);
+
+                // Extract dominant color from the first movie poster
+                const firstPoster = data.Search[0]?.Poster;
+                if (firstPoster && firstPoster !== 'N/A') {
+                    try {
+                        const palette = await Vibrant.from(firstPoster).getPalette();
+                        const color1 = palette.Vibrant ? palette.Vibrant.hex : '#1e293b';
+                        const color2 = palette.DarkVibrant ? palette.DarkVibrant.hex : '#111827';
+                        setDynamicTheme(`radial-gradient(circle at 50% 10%, ${color1}40, var(--bg-0) 60%, ${color2}60 100%)`);
+                    } catch (colorErr) {
+                        console.warn('Color extraction failed, using default theme.', colorErr);
+                        setDynamicTheme(null);
+                    }
+                } else {
+                    setDynamicTheme(null);
+                }
             } else {
                 setError(data.Error);
             }
@@ -82,8 +100,17 @@ const Home = () => {
         fetchMovies(query, type, year);
     };
 
+    const containerStyle = {
+        '--dynamic-bg': dynamicTheme || 'radial-gradient(circle at 50% 10%, var(--bg-1), var(--bg-0) 60%, var(--bg-2) 100%)'
+    };
+
     return (
-        <div className={`home-page-container ${!hasSearched ? 'landing-mode' : 'results-mode'}`}>
+        <div
+            className={`home-page-container ${!hasSearched ? 'landing-mode' : 'results-mode'}`}
+            style={containerStyle}
+        >
+            <div className="dynamic-background-layer" />
+
             <motion.div
                 className="home-search-section"
                 layout
